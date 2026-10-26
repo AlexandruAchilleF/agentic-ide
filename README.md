@@ -8,7 +8,6 @@
   <img src="https://img.shields.io/badge/Status-In%20Development-blueviolet?style=for-the-badge" alt="Status: In Development" />
   <img src="https://img.shields.io/badge/Team-OrchestronAI-orange?style=for-the-badge" alt="Team: OrchestronAI" />
   <img src="https://img.shields.io/badge/Architecture-Multi--Agent-brightgreen?style=for-the-badge" alt="Architecture" />
-  <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License" />
 </p>
 
 ---
@@ -41,6 +40,9 @@ Developed with passion by **OrchestronAI**:
 
 ## Project Roadmap
 
+The project is in the design phase: the architecture and agent protocol are being defined before the first code lands.
+
+
 - [x] Initial project setup & team alignment
 - [ ] Core architecture definition & agent communication protocol
 - [ ] Language server & workspace indexing integration
@@ -52,4 +54,4 @@ Developed with passion by **OrchestronAI**:
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE) (or subject to project specification).
+The license will be added together with the first code release.
