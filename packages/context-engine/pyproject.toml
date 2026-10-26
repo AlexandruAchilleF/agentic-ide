@@ -1,0 +1,20 @@
+[project]
+name = "context-engine"
+version = "0.1.0"
+description = "Deep context engine and code intelligence for the OrchestronAI agentic IDE"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{ name = "Alexandru Achille Flueraru" }]
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
