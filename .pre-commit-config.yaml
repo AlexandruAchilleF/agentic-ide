@@ -1,0 +1,28 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.3
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+        files: ^packages/context-engine/
+      - id: ruff-format
+        files: ^packages/context-engine/
+
+  # mypy runs from the package environment so it sees the real dependencies.
+  - repo: local
+    hooks:
+      - id: mypy-context-engine
+        name: mypy (context-engine)
+        entry: uv run --directory packages/context-engine mypy
+        language: system
+        pass_filenames: false
+        files: ^packages/context-engine/.*\.py$
