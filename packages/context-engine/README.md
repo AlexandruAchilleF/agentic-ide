@@ -20,6 +20,12 @@ Requires Python 3.12+ and [uv](https://docs.astral.sh/uv/).
 
 ```bash
 cd packages/context-engine
-uv sync          # create .venv and install pinned dependencies
-uv run pytest    # run the tests
+uv sync                    # create .venv and install pinned dependencies
+uv run pre-commit install  # once per clone: run the checks on every commit
+uv run pytest              # run the tests
+uv run ruff check .        # lint
+uv run ruff format .       # format
+uv run mypy                # type check (strict)
 ```
+
+CI runs the same checks on every pull request that touches this package.
