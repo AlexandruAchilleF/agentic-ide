@@ -14,6 +14,41 @@ Owner: Alexandru Achille Flueraru
 - `ContextRetriever`: the API the orchestrator calls
 - LSP integration for diagnostics, definitions and references
 
+## Using the contract
+
+The orchestrator depends only on the `ContextRetriever` protocol. Until the
+real retriever lands, `MockRetriever` implements it with canned data.
+
+```python
+from context_engine import ContextRequest, ContextRetriever, MockRetriever, Target
+
+retriever: ContextRetriever = MockRetriever()
+request = ContextRequest(
+    target=Target(path="src/app/main.py", symbol="run"),
+    query="why does run() crash on empty input?",
+    token_budget=4000,
+)
+response = await retriever.retrieve(request)
+for item in response.items:
+    print(item.path, item.start_line, item.end_line, item.reason)
+```
+
+| Model | Fields |
+| --- | --- |
+| `Target` | `path` (relative to the repo root), `symbol`, `line` |
+| `ContextRequest` | `target`, `query`, `token_budget` (default 8000) |
+| `ContextItem` | `path`, `start_line`, `end_line`, `kind`, `content`, `score` (0..1), `reason` |
+| `ContextResponse` | `items` (most relevant first), `tokens_used`, `truncated` |
+
+Rules every implementation follows:
+
+- Line numbers are 1-based and inclusive.
+- `tokens_used` never exceeds `token_budget`; `truncated` is true when
+  relevant code was left out to fit.
+- Models are immutable and reject unknown fields, so a misspelled field in a
+  JSON payload raises `pydantic.ValidationError` instead of being ignored.
+- Token counts are estimates (about four characters per token).
+
 ## Development
 
 Requires Python 3.12+ and [uv](https://docs.astral.sh/uv/).
