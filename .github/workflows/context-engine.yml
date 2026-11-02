@@ -1,0 +1,50 @@
+name: context-engine
+
+on:
+  pull_request:
+    paths:
+      - "packages/context-engine/**"
+      - ".github/workflows/context-engine.yml"
+  push:
+    branches: [main]
+    paths:
+      - "packages/context-engine/**"
+      - ".github/workflows/context-engine.yml"
+
+permissions:
+  contents: read
+
+# A new push to the same PR cancels the run that is still going.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: lint, type check, tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/context-engine
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          enable-cache: true
+
+      # Fails if uv.lock is out of date with pyproject.toml.
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Check formatting
+        run: uv run ruff format --check .
+
+      - name: Type check
+        run: uv run mypy
+
+      - name: Test
+        run: uv run pytest
