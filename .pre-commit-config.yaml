@@ -13,9 +13,9 @@ repos:
     hooks:
       - id: ruff-check
         args: [--fix]
-        files: ^packages/context-engine/
+        files: ^packages/(context-engine|orchestrator)/
       - id: ruff-format
-        files: ^packages/context-engine/
+        files: ^packages/(context-engine|orchestrator)/
 
   # mypy runs from the package environment so it sees the real dependencies.
   - repo: local
@@ -26,3 +26,10 @@ repos:
         language: system
         pass_filenames: false
         files: ^packages/context-engine/.*\.py$
+
+      - id: mypy-orchestrator
+        name: mypy (orchestrator)
+        entry: uv run --directory packages/orchestrator mypy
+        language: system
+        pass_filenames: false
+        files: ^packages/orchestrator/.*\.py$
