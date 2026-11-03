@@ -69,6 +69,34 @@ def test_request_parses_nested_json_payload() -> None:
     assert request.token_budget == 500
 
 
+def test_request_with_only_query() -> None:
+    # The planner's first request: it knows the task, not the files yet.
+    request = ContextRequest(query="add a login endpoint")
+
+    assert request.target is None
+    assert request.query == "add a login endpoint"
+
+
+def test_request_with_only_target() -> None:
+    request = ContextRequest(target=Target(path="a.py"))
+
+    assert request.target == Target(path="a.py")
+    assert request.query is None
+
+
+def test_request_rejects_missing_target_and_query() -> None:
+    # A request with neither asks for nothing; fail loudly at the boundary.
+    with pytest.raises(ValidationError, match="target or query"):
+        ContextRequest()
+
+
+def test_request_parses_query_only_json_payload() -> None:
+    request = ContextRequest.model_validate_json('{"query": "add login"}')
+
+    assert request.target is None
+    assert request.query == "add login"
+
+
 @pytest.mark.parametrize("budget", [0, -1])
 def test_request_rejects_non_positive_budget(budget: int) -> None:
     with pytest.raises(ValidationError):

@@ -13,7 +13,7 @@ class ContextRetriever(Protocol):
     """
 
     async def retrieve(self, request: ContextRequest) -> ContextResponse:
-        """Return the most relevant code for ``request.target``.
+        """Return the most relevant code for the request's target and query.
 
         ``tokens_used`` in the response never exceeds ``request.token_budget``.
         """

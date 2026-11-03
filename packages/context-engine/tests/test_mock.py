@@ -92,3 +92,13 @@ def test_mock_with_no_items_returns_an_empty_response() -> None:
     assert response.items == ()
     assert response.tokens_used == 0
     assert response.truncated is False
+
+
+def test_default_mock_handles_a_query_only_request() -> None:
+    request = ContextRequest(query="add a login endpoint")
+
+    response = retrieve(MockRetriever(), request)
+
+    assert len(response.items) == 1
+    assert "add a login endpoint" in response.items[0].content
+    assert response.truncated is False

@@ -5,11 +5,15 @@ from collections.abc import Sequence
 from context_engine.models import ContextItem, ContextRequest, ContextResponse
 from context_engine.tokens import estimate_tokens
 
+PLACEHOLDER_PATH = "<mock>"
+"""Path of the placeholder item returned for a query-only request."""
+
 
 class MockRetriever:
     """Returns canned items, honouring the token budget like a real retriever.
 
-    Without canned items it returns one placeholder item for the target.
+    Without canned items it returns one placeholder item for the target, or
+    for the query when the request has no target.
     Every request is recorded in ``requests`` so tests can inspect the calls.
     """
 
@@ -42,10 +46,15 @@ class MockRetriever:
     @staticmethod
     def _placeholder(request: ContextRequest) -> ContextItem:
         target = request.target
-        line = target.line or 1
-        label = target.symbol or target.path
+        if target is None:
+            # Query-only request: there is no file to point at, so use a path
+            # that cannot be mistaken for a real one.
+            path, line, label = PLACEHOLDER_PATH, 1, f"query: {request.query}"
+        else:
+            path, line = target.path, target.line or 1
+            label = target.symbol or target.path
         return ContextItem(
-            path=target.path,
+            path=path,
             start_line=line,
             end_line=line,
             kind="snippet",
