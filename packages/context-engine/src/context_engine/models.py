@@ -31,17 +31,27 @@ class Target(BaseModel):
 
 
 class ContextRequest(BaseModel):
-    """A request for the code that is relevant to ``target``.
+    """A request for the code that is relevant to ``target``, ``query`` or both.
 
-    ``query`` is an optional free-text hint, such as the task description.
-    ``token_budget`` is a hard upper bound for the returned content.
+    ``target`` is known when the caller is working on a specific file.
+    ``query`` is free text, such as the task description; a request with only
+    a query asks the engine to find the relevant files itself. At least one of
+    the two must be set. ``token_budget`` is a hard upper bound for the
+    returned content.
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    target: Target
+    target: Target | None = None
     query: str | None = Field(default=None, min_length=1)
     token_budget: int = Field(default=DEFAULT_TOKEN_BUDGET, gt=0)
+
+    @model_validator(mode="after")
+    def _check_has_target_or_query(self) -> Self:
+        if self.target is None and self.query is None:
+            msg = "a request needs a target or query"
+            raise ValueError(msg)
+        return self
 
 
 class ContextItem(BaseModel):
