@@ -36,9 +36,19 @@ for item in response.items:
 | Model | Fields |
 | --- | --- |
 | `Target` | `path` (relative to the repo root), `symbol`, `line` |
-| `ContextRequest` | `target`, `query`, `token_budget` (default 8000) |
+| `ContextRequest` | `target` (optional), `query` (optional), `token_budget` (default 8000); at least one of `target` and `query` is required |
 | `ContextItem` | `path`, `start_line`, `end_line`, `kind`, `content`, `score` (0..1), `reason` |
 | `ContextResponse` | `items` (most relevant first), `tokens_used`, `truncated` |
+
+A caller that does not know the relevant files yet, such as the planner at
+the start of a task, sends only a query:
+
+```python
+request = ContextRequest(query="add a login endpoint")
+```
+
+The mock answers a query-only request with a placeholder item whose path is
+`<mock>`.
 
 Rules every implementation follows:
 
@@ -48,6 +58,7 @@ Rules every implementation follows:
 - Models are immutable and reject unknown fields, so a misspelled field in a
   JSON payload raises `pydantic.ValidationError` instead of being ignored.
 - Token counts are estimates (about four characters per token).
+- Content is read from the working tree, so uncommitted edits are visible.
 
 ## Development
 
