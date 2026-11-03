@@ -78,6 +78,11 @@ The orchestrator calls the context engine **in-process** (it imports
 server with network errors and timeouts. The contract models serialize to
 JSON, so moving the engine behind HTTP later only adds a server layer.
 
+The Planner starts a task with only the task text, so its first request
+carries a `query` and no `target`; the engine finds the relevant files
+itself (#5). The engine reads content from the working tree, so QA sees the
+Coder's uncommitted edits.
+
 Each agent gets its own token budget, set by the orchestrator from that
 agent's model and job: the Planner needs broad context, the Coder a narrow
 slice. The engine's default budget is only a fallback.
@@ -93,6 +98,10 @@ slice. The engine's default budget is only a fallback.
 - **Fixed round limits** (two QA rounds for important changes, one for simple
   ones). Not needed while the user triggers QA; we can bring it back if QA
   becomes automatic.
+- **A codebase-memory MCP server for indexing.** Not in the MVP: it would
+  replace the context engine's indexer, search and graph, and it adds a
+  second server, against the in-process decision above. It can be added
+  later as an optional source behind the same `ContextRetriever` protocol.
 
 ## Consequences
 
@@ -119,10 +128,13 @@ off the review of its own work.
 - After QA reports findings, does the routing start automatically, or does
   the user choose what happens?
 - Do tests run automatically on every change, even without the QA button?
+  Running tests is the sandbox's job. Proposal from the context engine
+  review: tests run in the sandbox before the commit, so a commit happens
+  only when they pass. To be confirmed with the sandbox owner.
+- The real token budget of each agent, from each model's context window.
+  The context engine needs these numbers for the retriever.
 - Does QA's second pass only check that the earlier serious bugs were fixed,
   or does it also look for new serious bugs (regressions) the fix introduced?
 - Can the Coder send a finding back to the Planner when the fix turns out not
   to be local?
 - Which fields does a QA finding have?
-- Should the context engine use a codebase-memory MCP server for indexing?
-  To be discussed with the context engine owner.
