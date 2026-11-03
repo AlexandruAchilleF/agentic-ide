@@ -107,6 +107,13 @@ slice. The engine's default budget is only a fallback.
 - QA can mislabel an architecture problem as a small bug, so the Coder only
   fixes the symptom.
 
+## Planned extension
+
+An **auto-QA setting** that the user controls: when it is off, the user
+triggers QA with the button; when it is on, QA runs automatically after every
+change. The user, not an agent, owns this switch, so an agent can never turn
+off the review of its own work.
+
 ## Open questions
 
 - After QA reports findings, does the routing start automatically, or does
