@@ -1,5 +1,10 @@
 """Public contract models shared with the orchestrator.
 
+This module defines the data that crosses the boundary between the
+orchestrator and the context engine: what the caller asks for (``Target``,
+``ContextRequest``) and what the engine sends back (``ContextItem``,
+``ContextResponse``).
+
 Every model is immutable and rejects unknown fields, so a typo in a caller's
 payload fails loudly instead of being silently ignored. Line numbers are
 1-based and inclusive, like in editors and tracebacks.
@@ -12,6 +17,8 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 DEFAULT_TOKEN_BUDGET = 8000
 """Token budget used when the caller does not set one."""
 
+# `type X = ...` (Python 3.12) declares a type alias. `Literal[...]` means
+# only these exact strings are valid; Pydantic rejects anything else.
 type ItemKind = Literal["file", "class", "function", "method", "snippet"]
 """What a ContextItem holds; "snippet" is any range that is not a whole symbol."""
 
@@ -23,11 +30,14 @@ class Target(BaseModel):
     class or method inside the file; ``line`` points at a specific line.
     """
 
+    # frozen=True: fields cannot be reassigned after creation (immutable).
+    # extra="forbid": unknown keys in the input raise a ValidationError.
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    path: str = Field(min_length=1)
-    symbol: str | None = Field(default=None, min_length=1)
-    line: int | None = Field(default=None, ge=1)
+    # Field(...) adds validation rules that Pydantic checks on creation.
+    path: str = Field(min_length=1)  # empty string is not a valid path
+    symbol: str | None = Field(default=None, min_length=1)  # optional
+    line: int | None = Field(default=None, ge=1)  # ge=1: ">= 1", 1-based
 
 
 class ContextRequest(BaseModel):
@@ -42,16 +52,20 @@ class ContextRequest(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    target: Target | None = None
+    target: Target | None = None  # a nested model; dicts are converted to it
     query: str | None = Field(default=None, min_length=1)
-    token_budget: int = Field(default=DEFAULT_TOKEN_BUDGET, gt=0)
+    token_budget: int = Field(default=DEFAULT_TOKEN_BUDGET, gt=0)  # gt: "> 0"
 
+    # A model validator checks rules that involve several fields at once.
+    # mode="after" runs it once the individual fields are already validated,
+    # so `self` is a fully built model here.
     @model_validator(mode="after")
     def _check_has_target_or_query(self) -> Self:
         if self.target is None and self.query is None:
             msg = "a request needs a target or query"
+            # Pydantic turns a ValueError raised here into a ValidationError.
             raise ValueError(msg)
-        return self
+        return self  # an "after" validator must return the model
 
 
 class ContextItem(BaseModel):
@@ -64,11 +78,11 @@ class ContextItem(BaseModel):
 
     path: str = Field(min_length=1)
     start_line: int = Field(ge=1)
-    end_line: int = Field(ge=1)
+    end_line: int = Field(ge=1)  # inclusive: start_line == end_line is 1 line
     kind: ItemKind
-    content: str
-    score: float = Field(ge=0.0, le=1.0)
-    reason: str = Field(min_length=1)
+    content: str  # the source code itself, as read from the working tree
+    score: float = Field(ge=0.0, le=1.0)  # le: "<= 1.0"
+    reason: str = Field(min_length=1)  # human-readable "why this was picked"
 
     @model_validator(mode="after")
     def _check_line_range(self) -> Self:
@@ -86,6 +100,8 @@ class ContextResponse(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
+    # A tuple instead of a list, so the response stays immutable all the way
+    # down: a frozen model holding a list could still have the list mutated.
     items: tuple[ContextItem, ...] = ()
     tokens_used: int = Field(default=0, ge=0)
     truncated: bool = False

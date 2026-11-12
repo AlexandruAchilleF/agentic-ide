@@ -1,4 +1,9 @@
-"""A stand-in retriever, so callers can integrate before the real one exists."""
+"""A stand-in retriever, so callers can integrate before the real one exists.
+
+``MockRetriever`` follows the ``ContextRetriever`` protocol and enforces the
+token budget, but returns fixed items instead of searching the repository.
+The orchestrator uses it in its own tests and during early integration.
+"""
 
 from collections.abc import Sequence
 
@@ -17,7 +22,11 @@ class MockRetriever:
     Every request is recorded in ``requests`` so tests can inspect the calls.
     """
 
+    # Sequence accepts any ordered collection (list, tuple, ...) from callers.
     def __init__(self, items: Sequence[ContextItem] | None = None) -> None:
+        # None and [] mean different things: None -> "use a placeholder",
+        # [] -> "nothing was found". Copying into a tuple stops later changes
+        # to the caller's list from leaking into the mock.
         self._items = tuple(items) if items is not None else None
         self.requests: list[ContextRequest] = []
 
@@ -28,6 +37,9 @@ class MockRetriever:
             self._items if self._items is not None else (self._placeholder(request),)
         )
 
+        # Greedy selection: walk the items in order and keep each one that
+        # still fits. An item that does not fit is skipped, not a reason to
+        # stop, because a smaller item further on may still fit.
         selected: list[ContextItem] = []
         tokens_used = 0
         for item in candidates:
@@ -40,9 +52,12 @@ class MockRetriever:
         return ContextResponse(
             items=tuple(selected),
             tokens_used=tokens_used,
+            # Fewer items selected than available means something was cut.
             truncated=len(selected) < len(candidates),
         )
 
+    # @staticmethod: the method does not use `self`, it only builds a value
+    # from its argument.
     @staticmethod
     def _placeholder(request: ContextRequest) -> ContextItem:
         target = request.target
@@ -51,6 +66,9 @@ class MockRetriever:
             # that cannot be mistaken for a real one.
             path, line, label = PLACEHOLDER_PATH, 1, f"query: {request.query}"
         else:
+            # `x or y` returns y when x is falsy; here that only happens when
+            # x is None, because the model rejects line=0 and symbol="".
+            # So line defaults to 1 and the label falls back to the path.
             path, line = target.path, target.line or 1
             label = target.symbol or target.path
         return ContextItem(
