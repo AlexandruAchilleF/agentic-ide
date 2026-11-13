@@ -1,4 +1,8 @@
-"""Tests for the public contract models."""
+"""Tests for the public contract models.
+
+Most tests check that invalid input raises ``ValidationError``: the models
+are the boundary with the orchestrator, so bad data must be caught there.
+"""
 
 import pytest
 from pydantic import ValidationError
@@ -28,10 +32,12 @@ def test_target_with_symbol_and_line() -> None:
 
 
 def test_target_rejects_empty_path() -> None:
+    # pytest.raises passes only if the block raises the given exception.
     with pytest.raises(ValidationError):
         Target(path="")
 
 
+# parametrize runs the test once per value, each reported as its own test.
 @pytest.mark.parametrize("line", [0, -3])
 def test_target_rejects_line_below_one(line: int) -> None:
     # Lines are 1-based, like in editors and tracebacks.
@@ -41,6 +47,7 @@ def test_target_rejects_line_below_one(line: int) -> None:
 
 def test_target_rejects_unknown_fields() -> None:
     # A typo such as "lin" from a caller must fail loudly, not be ignored.
+    # model_validate builds a model from a dict, as if it came from JSON.
     with pytest.raises(ValidationError):
         Target.model_validate({"path": "a.py", "lin": 3})
 
@@ -48,6 +55,8 @@ def test_target_rejects_unknown_fields() -> None:
 def test_target_is_immutable() -> None:
     target = Target(path="a.py")
 
+    # The type: ignore silences mypy, which already knows the field is frozen;
+    # here we want the assignment to run and fail at runtime.
     with pytest.raises(ValidationError):
         target.line = 5  # type: ignore[misc]
 
@@ -86,6 +95,7 @@ def test_request_with_only_target() -> None:
 
 def test_request_rejects_missing_target_and_query() -> None:
     # A request with neither asks for nothing; fail loudly at the boundary.
+    # match= also checks the error message, so we know which rule failed.
     with pytest.raises(ValidationError, match="target or query"):
         ContextRequest()
 
@@ -104,6 +114,8 @@ def test_request_rejects_non_positive_budget(budget: int) -> None:
 
 
 def make_item(**overrides: object) -> ContextItem:
+    # Test helper: a valid item by default; each test overrides only the
+    # field it is about, e.g. make_item(score=1.1).
     fields: dict[str, object] = {
         "path": "a.py",
         "start_line": 3,
@@ -140,6 +152,8 @@ def test_item_rejects_unknown_kind() -> None:
 
 
 def test_response_json_round_trip() -> None:
+    # Serialize to JSON and back: what the orchestrator receives must turn
+    # into an equal object.
     response = ContextResponse(items=(make_item(),), tokens_used=12)
 
     restored = ContextResponse.model_validate_json(response.model_dump_json())

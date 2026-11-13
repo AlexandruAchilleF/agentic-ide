@@ -1,4 +1,8 @@
-"""Tests for the mock retriever the orchestrator uses before the real one."""
+"""Tests for the mock retriever the orchestrator uses before the real one.
+
+Also covers ``estimate_tokens``, since the mock's budget logic depends on it.
+Tests follow Arrange / Act / Assert, separated by blank lines.
+"""
 
 import asyncio
 
@@ -14,6 +18,7 @@ from context_engine.tokens import estimate_tokens
 
 
 def make_item(path: str, content: str) -> ContextItem:
+    # Test helper: only path and content matter for the mock's behaviour.
     return ContextItem(
         path=path,
         start_line=1,
@@ -26,6 +31,8 @@ def make_item(path: str, content: str) -> ContextItem:
 
 
 def retrieve(retriever: ContextRetriever, request: ContextRequest) -> ContextResponse:
+    # retrieve() is async; asyncio.run starts an event loop, runs the
+    # coroutine to completion and returns its result, so tests stay sync.
     return asyncio.run(retriever.retrieve(request))
 
 
@@ -65,6 +72,7 @@ def test_mock_returns_canned_items_in_order() -> None:
 
 
 def test_mock_respects_the_token_budget() -> None:
+    # Each item costs 40 / 4 = 10 tokens; only one fits in a budget of 15.
     items = [make_item("a.py", "a" * 40), make_item("b.py", "b" * 40)]
     request = ContextRequest(target=Target(path="a.py"), token_budget=15)
 
