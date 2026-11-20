@@ -45,7 +45,10 @@ In the MVP the context engine supports:
 - An in-memory index. File content is read from disk on every request, and a
   file is re-indexed when its modification time changes, so uncommitted
   edits are always visible.
-- Text search with ripgrep for requests that only have a `query`.
+- Text search with ripgrep, used only inside `get_context` as a source of
+  candidates for requests that only have a `query`. It is not exposed as a
+  separate tool, because agent harnesses already ship a ripgrep-based search
+  tool (see D7).
 - An import graph between the project's own files (no external libraries,
   no call graph).
 - Fixed ranking weights (target, then imports, then text matches) and greedy
@@ -56,6 +59,19 @@ real incremental re-indexing, a call graph and semantic search. SQLite can
 later replace the in-memory index behind the same interface.
 
 Why: the end-of-December deadline. We cut features, not tests or review.
+
+Revised on 2026-11-20, after D7: an agent in an existing harness can
+already search the code itself with its built-in tools (read, grep, glob).
+The engine is only worth having if it beats that, so we measure it early
+instead of only at the final demo:
+
+- Right after the indexer is merged, a rough evaluation on 3 to 5 tasks
+  from a real repository: the agent without our tools versus the agent
+  with them.
+- Measured: tokens used, number of tool calls, and whether the task was
+  solved.
+- The text search phase is reduced to the internal use above; the time
+  saved goes to the import graph and the evaluation.
 
 ## D7. Use an existing agent harness; our modules become MCP tools
 
@@ -100,7 +116,10 @@ get_context, find_symbol   run_tests, run_command in Docker
 
 - **Context engine**: a thin MCP server over the existing `ContextRetriever`.
   The indexer, search, graph and selection logic do not change; only the
-  delivery does.
+  delivery does. It complements the harness's built-in file tools instead
+  of replacing them: it exposes only what text search does poorly (the
+  exact lines of a symbol, the symbol at a given line, import relations,
+  and context selected under a token budget).
 - **Sandbox**: an MCP server that runs commands and tests in Docker and
   returns their output, errors and diagnostics in a clear format.
 - **Self-healing**: no separate module. When a tool returns an error, the
