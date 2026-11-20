@@ -31,10 +31,10 @@ Developed with passion by **OrchestronAI**:
 
 ## Vision & Core Pillars
 
-* **Multi-Agent Orchestration**: Coordinating specialized agent personas (Architect, Planner, Coder, Code Reviewer, QA/Tester) working synchronously and asynchronously.
-* **Deep Context Engine**: Semantic indexing and repository-wide context graph for precise understanding of architecture and dependencies.
+* **Multi-Agent Workflow**: Planner, Coder and QA agents, each with its own job and model; QA is started by the developer.
+* **Deep Context Engine**: Structural indexing (Tree-sitter) and an import graph that select only the relevant code under a token budget.
 * **Sandboxed Autonomous Execution**: Safe tool execution environment (terminal commands, test suites, builds) with granular human-in-the-loop approvals.
-* **Pair Programming Experience**: Seamless real-time collaboration between developers and AI agents with interactive diffs, previews, and feedback loops.
+* **Developer in Control**: A thin web UI with the agents' timeline, the diffs of their changes and a QA button.
 
 ---
 
