@@ -3,6 +3,10 @@
 - Status: Proposed (waiting for team agreement)
 - Date: 2026-10-27
 - Author: Alexandru Achille Flueraru
+- Note: the module descriptions below predate
+  [ADR-0003](0003-existing-harness-and-mcp-tools.md) (Proposed), which
+  changes what the orchestrator and sandbox packages do. The layout itself
+  stays.
 
 ## Context
 

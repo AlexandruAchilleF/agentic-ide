@@ -38,17 +38,48 @@ Developed with passion by **OrchestronAI**:
 
 ---
 
+## Architecture
+
+Proposed in [ADR-0003](docs/adr/0003-existing-harness-and-mcp-tools.md): instead of writing our own agent loop, we build on [OpenCode](https://opencode.ai), an open-source coding agent, and deliver our modules as MCP tools it calls.
+
+```
+Developer
+   |
+   v
+OpenCode (terminal, or our UI through the SDK)
+   |  agents: Planner, Coder, QA
+   |
+   |  MCP
+   +---------------------------+
+   v                           v
+context-engine (MCP)        sandbox (MCP)
+get_context, find_symbol    run_tests, run_command in Docker
+```
+
+| Package | Owner | Role |
+| --- | --- | --- |
+| [`context-engine`](packages/context-engine/) | Alexandru | Relevant code under a token budget |
+| [`orchestrator`](packages/orchestrator/) | David | Integration: agents, OpenCode config, evaluation |
+| [`sandbox`](packages/sandbox/) | Radu | Tests and commands in Docker |
+| [`ui`](packages/ui/) | Otniel | Thin web UI over the OpenCode SDK |
+
+All decisions and their status are listed in [docs/decisions.md](docs/decisions.md).
+
+---
+
 ## Project Roadmap
 
-The project is in the design phase: the architecture and agent protocol are being defined before the first code lands.
-
+Target: a working MVP by 2026-12-31.
 
 - [x] Initial project setup & team alignment
-- [ ] Core architecture definition & agent communication protocol
-- [ ] Language server & workspace indexing integration
-- [ ] Sandbox execution engine & security guardrails
-- [ ] User interface & agent visual interaction canvas
-- [ ] Alpha release & evaluation benchmarks
+- [x] Context engine contract (Pydantic models, `ContextRetriever` protocol, mock)
+- [ ] Choice of harness and new architecture (ADR-0003)
+- [ ] Walking skeleton: one MCP tool connected to OpenCode end to end
+- [ ] Context engine: Python indexer, import graph, budgeted selection, MCP server
+- [ ] Sandbox MCP server with Docker isolation
+- [ ] Agent roles (Planner, Coder, QA) as OpenCode configuration
+- [ ] Evaluation: agents with and without our tools
+- [ ] Thin web UI
 
 ---
 

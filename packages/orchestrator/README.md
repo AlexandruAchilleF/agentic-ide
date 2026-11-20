@@ -1,12 +1,23 @@
 # Orchestrator
 
-Agent orchestration and core runtime: the central asynchronous server, the task
-DAG and the event bus that connects agents and the other modules.
+Integration of the agents with the harness. Originally planned as our own
+agent runtime (async server, task DAG, event bus); under
+[ADR-0003](../../docs/adr/0003-existing-harness-and-mcp-tools.md) (Proposed)
+this package becomes the integration layer instead:
+
+- the OpenCode configuration (`opencode.jsonc`) that wires in the context
+  engine and sandbox MCP servers;
+- the Planner, Coder and QA agents of
+  [ADR-0002](../../docs/adr/0002-agent-workflow-and-qa.md), as files in
+  `.opencode/agents/`, with their models and permissions;
+- the walking skeleton that tests the whole chain;
+- a script that runs evaluation tasks headless and collects the numbers.
+
+The package will be renamed once the team agrees on ADR-0003.
 
 Owner: David Gaina
 
-Status: scaffolded. See [ADR-0001](../../docs/adr/0001-monorepo-layout.md) for
-the repository layout.
+Status: scaffolded.
 
 ## Development
 

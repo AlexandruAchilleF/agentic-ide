@@ -8,15 +8,24 @@ Owner: Alexandru Achille Flueraru
 
 ## Planned components
 
-- Tree-sitter indexer: symbols (functions, classes, calls) stored in SQLite
-- Dependency graph of the workspace (imports and module relations)
-- Lexical search with ripgrep
-- `ContextRetriever`: the API the orchestrator calls
-- LSP integration for diagnostics, definitions and references
+MVP scope (see D6 in [docs/decisions.md](../../docs/decisions.md)):
+
+- Tree-sitter indexer for Python: functions, classes and methods, kept in
+  memory
+- Import graph between the project's own files
+- Lexical search with ripgrep, used internally as a source of candidates
+- `ContextRetriever`: greedy selection under a token budget, with a reason
+  for every item
+- A thin MCP server (`get_context`, `find_symbol`), so the harness can call
+  the engine as a tool
+  ([ADR-0003](../../docs/adr/0003-existing-harness-and-mcp-tools.md),
+  Proposed)
+
+After the MVP: SQLite storage, LSP integration, a call graph.
 
 ## Using the contract
 
-The orchestrator depends only on the `ContextRetriever` protocol. Until the
+Callers depend only on the `ContextRetriever` protocol. Until the
 real retriever lands, `MockRetriever` implements it with canned data.
 
 ```python

@@ -22,9 +22,10 @@ Statuses:
 | D4 | Context engine contract: Pydantic models and a `ContextRetriever` protocol | Accepted | PR #3, PR #5 |
 | D5 | A context request needs a `target`, a `query`, or both | Accepted | PR #5 |
 | D6 | Reduced MVP scope for the context engine | Accepted | This file |
-| D7 | Use an existing agent harness; our modules become MCP tools | Proposed | This file; ADR-0003 to follow |
-| D8 | Which harness we use | Open | This file |
-| D9 | Do we build our own interface on top of the harness | Open | This file |
+| D7 | Use an existing agent harness; our modules become MCP tools | Proposed | This file, [ADR-0003](adr/0003-existing-harness-and-mcp-tools.md) |
+| D8 | OpenCode as the harness, with free model access | Proposed | This file, ADR-0003 |
+| D9 | A thin UI of our own, built after the walking skeleton | Proposed | This file, ADR-0003 |
+| D10 | New split of the work between the four members | Proposed | This file |
 
 ## D4. Context engine contract
 
@@ -75,8 +76,9 @@ instead of only at the final demo:
 
 ## D7. Use an existing agent harness; our modules become MCP tools
 
-Status: Proposed, waiting for team agreement. The full ADR (ADR-0003) will
-follow once the team agrees.
+Status: Proposed, waiting for team agreement. The full reasoning, together
+with D8 and D9, is in
+[ADR-0003](adr/0003-existing-harness-and-mcp-tools.md), also Proposed.
 
 ### Context
 
@@ -167,11 +169,59 @@ works end to end.
   answer, connected to the chosen harness, to test the whole chain before
   the real logic is ready.
 
+## D8. OpenCode as the harness, with free model access
+
+Status: Proposed. Full reasoning in
+[ADR-0003](adr/0003-existing-harness-and-mcp-tools.md).
+
+Requirements: free for a student team, open source (so we can read how
+the loop works), MCP support, configurable agents (for the roles in
+ADR-0002), a headless mode, and an API a UI can drive.
+
+Proposal: [OpenCode](https://opencode.ai) (MIT license). Models, in order
+of preference:
+
+1. GitHub Copilot through the free GitHub Student Developer Pack, connected
+   with "Login with GitHub Copilot" in OpenCode.
+2. The free models listed by OpenCode. Some of them keep prompts or use
+   them for training, so we send them only code from this public repository.
+3. Local models through Ollama, for offline work. Weaker, and slow on a
+   laptop.
+
+Rejected: Claude Agent SDK (needs a paid API key or a paid plan), Gemini
+CLI (its free tier changed in 2026 and the reports conflict), our own
+harness (D7).
+
+## D9. A thin UI of our own, built after the walking skeleton
+
+Status: Proposed.
+
+For the MVP the team works in the OpenCode terminal interface. Once the
+whole chain works, the UI owner builds a small web UI on the OpenCode
+TypeScript SDK: a prompt box, the timeline of agent events, the diff of the
+changes, the QA button from ADR-0002 and a panel that shows what context
+the context engine chose and why. The UI contains no agent logic.
+
+## D10. New split of the work
+
+Status: Proposed, to be confirmed by each member for their own part.
+
+| Member | Package | MVP work |
+| --- | --- | --- |
+| Alexandru | `context-engine` | Indexer, import graph and budgeted selection behind an MCP server (`get_context`, `find_symbol`); the evaluation of the engine (D6). |
+| David | `orchestrator` (to be renamed) | Integration: OpenCode config in `.opencode/` (Planner, Coder and QA agents from ADR-0002, permissions, MCP servers); the walking skeleton; a script that runs evaluation tasks headless and collects the numbers. |
+| Radu | `sandbox` | MCP server that runs tests and commands in Docker and returns structured results. The agents' own shell tool is denied, so every command goes through the sandbox. |
+| Otniel | `ui` | The thin UI from D9, on the OpenCode SDK. Until the skeleton works: a static mock of the screens. |
+
+Self-healing (from the original sandbox scope) needs no separate code: the
+harness loop already shows test errors to the model. Its quality depends on
+how clear the sandbox's error output is.
+
 ## Open questions
 
-- D8: which harness we use. It must support MCP servers and, if D9 is
-  accepted, a headless mode the backend can drive.
-- D9: do we build our own UI, or use the harness's interface for the MVP.
-- How the work of the orchestrator and sandbox owners is redistributed
-  after D7.
+- Does the GitHub Copilot student plan work inside OpenCode for all four
+  members, and with which models? To check in the walking skeleton.
+- Which free fallback model is good enough for the Coder role?
+- Does `opencode run` report token usage per run? The evaluation needs it.
+- The new name of `packages/orchestrator` (for example `integration`).
 - The real token budget of each agent role (from ADR-0002).

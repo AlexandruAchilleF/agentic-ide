@@ -3,6 +3,9 @@
 - Status: Proposed (waiting for team agreement)
 - Date: 2026-11-03
 - Author: David Gaina
+- Note: [ADR-0003](0003-existing-harness-and-mcp-tools.md) (Proposed) would
+  replace the in-process context engine and the default models below. The
+  three roles and the user-triggered QA stay.
 
 ## Context
 
