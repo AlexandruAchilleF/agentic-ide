@@ -213,6 +213,19 @@ Status: Proposed, to be confirmed by each member for their own part.
 | Radu | `sandbox` | MCP server that runs tests and commands in Docker and returns structured results. The agents' own shell tool is denied, so every command goes through the sandbox. |
 | Otniel | `ui` | The thin UI from D9, on the OpenCode SDK. Until the skeleton works: a static mock of the screens. |
 
+Proposed schedule (each member confirms or changes their own column):
+
+| Period | Alexandru | David | Radu | Otniel |
+| --- | --- | --- | --- | --- |
+| Nov 21-30 | Minimal MCP server (`find_symbol`); rough evaluation | Walking skeleton: `opencode.jsonc`, one agent, the context engine MCP server | Docker image; running the tests from the command line | Static mocks of the screens |
+| Dec 1-10 | Import graph | Planner, Coder and QA agents with permissions; evaluation script | Sandbox MCP server (`run_tests`, `run_command`); shell denied to the agents | UI on the SDK: prompt box and event timeline |
+| Dec 11-21 | Retriever v1, `get_context`, demo command | Full evaluation runs and results | Structured errors (failing tests, file and line) | Diff view, QA button, context panel |
+| Dec 22-31 | Buffer | Buffer | Buffer | Buffer |
+
+In the first week everyone installs the pinned OpenCode version and checks
+that the GitHub Copilot student login works. If it fails for anyone, we pick
+the free fallback model before December 1.
+
 Self-healing (from the original sandbox scope) needs no separate code: the
 harness loop already shows test errors to the model. Its quality depends on
 how clear the sandbox's error output is.
