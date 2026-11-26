@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OrchestronAI — Agentic IDE</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">◆</span>
+      <span class="name">OrchestronAI</span>
+      <span class="sub">Agentic IDE</span>
+    </div>
+    <div class="meta">
+      <span class="chip">proiect: <b id="project"></b></span>
+      <span class="chip">agent: <b id="agent"></b></span>
+      <span id="status" class="status idle">Inactiv</span>
+      <button id="qaBtn" class="btn secondary" disabled>Rulează QA</button>
+    </div>
+  </header>
+
+  <div class="notice">Date de test · interfața nu e încă legată la OpenCode</div>
+
+  <main class="layout">
+    <!-- Coloana 1: cererea + pașii agentului -->
+    <section class="panel left">
+      <div class="panel-head">Cerere</div>
+      <div class="prompt">
+        <textarea id="prompt" rows="3"></textarea>
+        <button id="sendBtn" class="btn primary">Trimite</button>
+      </div>
+
+      <div class="panel-head">Pașii agentului</div>
+      <div class="scroll">
+        <ol id="timeline" class="timeline">
+          <li class="empty">Apasă „Trimite” ca să pornești agentul.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Coloana 2: rezumatul QA + modificările propuse, verificate una câte una -->
+    <section class="panel middle">
+      <div class="panel-head">Modificări <span id="changesCount" class="muted"></span></div>
+      <div class="scroll">
+        <div id="summary" class="summary" hidden></div>
+        <div id="emptyChanges" class="empty">Încă nicio modificare.</div>
+        <div id="changes" class="changes"></div>
+      </div>
+      <div id="review" class="review" hidden>
+        <span id="reviewNote" class="review-note"></span>
+        <div id="reviewActions" class="review-actions">
+          <button id="rejectBtn" class="btn secondary">✕ Respinge</button>
+          <button id="acceptBtn" class="btn primary">✓ Acceptă</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Coloana 3: contextul ales -->
+    <section class="panel right">
+      <div class="panel-head">Context ales <span id="budget" class="muted"></span></div>
+      <div id="context" class="context">
+        <div class="empty">Motorul de context n-a ales încă nimic.</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="mockData.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
