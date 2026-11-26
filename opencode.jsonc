@@ -1,0 +1,17 @@
+{
+  // Tested with OpenCode 1.19.6 (npm i -g opencode-ai@1.19.6).
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "coder",
+  "mcp": {
+    "servers": {
+      // Walking-skeleton stub; replaced by the context engine's MCP server.
+      "orchestron-stub": {
+        "type": "local",
+        "command": [
+          "uv", "run", "--directory", "packages/orchestrator",
+          "python", "-m", "orchestrator.stub_mcp"
+        ]
+      }
+    }
+  }
+}
