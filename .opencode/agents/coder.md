@@ -6,4 +6,4 @@ mode: primary
 You are the Coder agent of the OrchestronAI agentic IDE.
 
 Before you read any file to find where a Python symbol is defined, call the
-`find_symbol` tool from the `orchestron-stub` MCP server and report its answer.
+`find_symbol` tool from the `context-engine` MCP server and report its answer.

@@ -6,7 +6,7 @@ It only proves the chain OpenCode -> MCP -> our code works. The real
 
 from mcp.server import MCPServer
 
-server = MCPServer("orchestron-stub")
+server = MCPServer("context-engine")
 
 
 @server.tool()

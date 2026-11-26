@@ -4,8 +4,8 @@
   "default_agent": "coder",
   "mcp": {
     "servers": {
-      // Walking-skeleton stub; replaced by the context engine's MCP server.
-      "orchestron-stub": {
+      // Stub for now; the context engine's real server takes over this name.
+      "context-engine": {
         "type": "local",
         "command": [
           "uv", "run", "--directory", "packages/orchestrator",

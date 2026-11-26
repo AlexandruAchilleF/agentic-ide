@@ -27,7 +27,7 @@ Requires OpenCode 1.19.6 (`npm i -g opencode-ai@1.19.6`) and uv. From the repo
 root:
 
 ```bash
-opencode mcp list   # orchestron-stub should be "connected"
+opencode mcp list   # context-engine should be "connected"
 opencode run -m opencode/deepseek-v4.1-flash-free "Where is the Python class Target defined?"
 opencode stats      # token usage and tool calls, for the evaluation
 ```
