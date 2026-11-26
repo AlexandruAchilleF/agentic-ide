@@ -11,6 +11,15 @@
           "uv", "run", "--directory", "packages/orchestrator",
           "python", "-m", "orchestrator.stub_mcp"
         ]
+      },
+      // Runs commands and tests in a container. --project keeps the working
+      // directory at the repo root, which the server mounts as /work.
+      "sandbox": {
+        "type": "local",
+        "command": [
+          "uv", "run", "--project", "packages/sandbox",
+          "python", "-m", "sandbox.server"
+        ]
       }
     }
   }
