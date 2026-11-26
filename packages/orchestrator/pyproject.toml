@@ -5,7 +5,9 @@ description = "Agent orchestration and core runtime for the OrchestronAI agentic
 readme = "README.md"
 requires-python = ">=3.12"
 authors = [{ name = "David Gaina" }]
-dependencies = []
+dependencies = [
+    "mcp>=2.3.0",
+]
 
 [dependency-groups]
 dev = [
