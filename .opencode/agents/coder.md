@@ -1,6 +1,7 @@
 ---
 description: Coder agent (walking skeleton). Uses our MCP tools before reading files.
-mode: primary
+# "all": the Coder runs on its own or as the Planner's subagent.
+mode: all
 ---
 
 You are the Coder agent of the OrchestronAI agentic IDE.
