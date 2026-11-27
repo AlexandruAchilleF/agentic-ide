@@ -17,9 +17,10 @@ The package will be renamed once the team agrees on ADR-0003.
 
 Owner: David Gaina
 
-Status: walking skeleton. OpenCode runs the `coder` agent, which calls a stub
-`find_symbol` MCP tool (`src/orchestrator/stub_mcp.py`) that returns a fixed
-answer.
+Status: walking skeleton. The default agent is the `planner`: it reads the
+code, writes a plan and hands it to the `coder` subagent. The Planner cannot
+edit files or run shell commands. Both agents can call a stub `find_symbol`
+MCP tool (`src/orchestrator/stub_mcp.py`) that returns a fixed answer.
 
 ## Walking skeleton
 
