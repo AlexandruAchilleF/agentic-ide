@@ -1,7 +1,7 @@
 {
   // Tested with OpenCode 1.19.6 (npm i -g opencode-ai@1.19.6).
   "$schema": "https://opencode.ai/config.json",
-  "default_agent": "coder",
+  "default_agent": "planner",
   "mcp": {
     "servers": {
       // Stub for now; the context engine's real server takes over this name.
