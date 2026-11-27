@@ -17,7 +17,24 @@ The package will be renamed once the team agrees on ADR-0003.
 
 Owner: David Gaina
 
-Status: scaffolded.
+Status: walking skeleton. OpenCode runs the `coder` agent, which calls a stub
+`find_symbol` MCP tool (`src/orchestrator/stub_mcp.py`) that returns a fixed
+answer.
+
+## Walking skeleton
+
+Requires OpenCode 1.19.6 (`npm i -g opencode-ai@1.19.6`) and uv. From the repo
+root:
+
+```bash
+opencode mcp list   # context-engine should be "connected"
+opencode run -m opencode/deepseek-v4.1-flash-free "Where is the Python class Target defined?"
+opencode stats      # token usage and tool calls, for the evaluation
+```
+
+The free `opencode/*-free` models may keep prompts, so only use them on this
+public repository. GitHub Copilot (`opencode providers login`) is the
+preferred model source (ADR-0003).
 
 ## Development
 
